@@ -1,4 +1,4 @@
-require_relative 'smokestack'
+require_relative 'world'
 
 World.define do
   factory User do
