@@ -1,3 +1,25 @@
+class Factory < BasicObject
+  attr_reader :attributes
+
+  def initialize
+    @attributes = {}
+  end
+
+  def method_missing(name, *args, &block)
+    attributes[name] = args[0]
+  end
+end
+
+class DefinitionProxy
+  def factory(factory_class, &block)
+    factory = Factory.new
+    if block_given?
+      factory.instance_eval(&block)
+    end
+    World.registry[factory_class] = factory
+  end
+end
+
 module World
   @registry = {}
 
@@ -27,33 +49,3 @@ class User
   attr_accessor :name, :nickname
 end
 
-class Factory < BasicObject
-  attr_reader :attributes
-
-  def initialize
-    @attributes = {}
-  end
-
-  def method_missing(name, *args, &block)
-    attributes[name] = args[0]
-  end
-end
-
-
-class DefinitionProxy
-  def factory(factory_class, &block)
-    factory = Factory.new
-    if block_given?
-      factory.instance_eval(&block)
-    end
-    World.registry[factory_class] = factory
-  end
-end
-
-
-World.define do
-  factory User do
-    name "John Appleseed"
-    nickname "johnny"
-  end
-end
